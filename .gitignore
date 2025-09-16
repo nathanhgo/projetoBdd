@@ -41,3 +41,6 @@ dist/
 build/
 out/
 target/
+
+# Ambiente virtual
+venv/
