@@ -1,0 +1,43 @@
+# # # Arquivos de Sistema Operacional e Cache # # #
+.DS_Store
+Thumbs.db
+._*
+.Spotlight-V100
+.Trashes
+
+# # # Logs e Arquivos Temporários # # #
+*.log
+npm-debug.log*
+yarn-error.log
+pnpm-debug.log*
+lerna-debug.log*
+*.temp
+*.tmp
+
+# # # Arquivos de Ambiente (NUNCA envie segredos para o repositório!) # # #
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env.*
+
+# Mantenha um arquivo de exemplo, se houver
+!.env.example
+
+# # # Pastas de IDEs e Editores de Código # # #
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+nbproject/
+.project
+.settings/
+
+# # # Arquivos de Dependências e Builds # # #
+# (Seções mais específicas abaixo)
+node_modules/
+dist/
+build/
+out/
+target/
