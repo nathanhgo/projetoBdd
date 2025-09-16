@@ -44,3 +44,6 @@ target/
 
 # Ambiente virtual
 venv/
+
+# a porra do pycache
+__pycache__/
