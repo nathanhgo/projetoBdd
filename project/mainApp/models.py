@@ -1,27 +1,31 @@
 from django.db import models
 from rest_framework import serializers
+from datetime import datetime
+from django.contrib.auth.models import AbstractUser
 
-# Create your models here.
+class UserProfile(AbstractUser):
+    description = models.CharField(max_length=255, null=True)
 
-# EXEMPLO
+class Authors(models.Model):
+    name = models.CharField(max_length=255, null=False)
 
-# class Usuario(models):
-#     nome = models.CharField(max_length=255)
-#     email = models.CharField(max_length=255)
-#     senha = models.CharField(max_length=255)
-#     telefone = models.CharField(max_length=255)
-#     endereco = models.CharField(max_length=255)
-#     cep = models.CharField(max_length=255)
-#     cidade = models.CharField(max_length=255)
-#     estado = models.CharField(max_length=255)
-#     pais = models.CharField(max_length=255)
-#     cpf = models.CharField(max_length=255)
-#     rg = models.CharField(max_length=255)
-#     data_nascimento = models.DateField()
 
-# class UsuarioSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = Usuario
-#         fields = [
-#             'nome', 'email', 'senha'
-#         ]
+class MetaBooks(models.Model):
+    title = models.CharField(max_length=255, null=False)
+    description = models.CharField(max_length=255, null=False)
+    author = models.ForeignKey(Authors, on_delete=models.CASCADE, null=False)
+    pages = models.IntegerField()
+    release_date = models.DateField(default=datetime.now, null=False)
+
+class PhysicalBooks(models.Model):
+    meta_book = models.ForeignKey(MetaBooks, on_delete=models.CASCADE, null=False)
+    owner = models.ForeignKey(UserProfile, on_delete=models.CASCADE, null=False)
+    description = models.CharField(max_length=255, null=True)
+    created_at = models.DateField(default=datetime.now, null=False)
+
+class Transactions(models.Model):
+    old_owner = models.ForeignKey(UserProfile, on_delete=models.CASCADE, null=False, related_name='old_owner')
+    new_owner = models.ForeignKey(UserProfile, on_delete=models.CASCADE, null=False, related_name='new_owner')
+    physical_book = models.ForeignKey(PhysicalBooks, on_delete=models.CASCADE, null=False)
+    transaction_date = models.DateField(default=datetime.now, null=False)
+    transaction_type = models.CharField(max_length=16, null=False)

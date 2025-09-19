@@ -157,3 +157,8 @@ SWAGGER_SETTINGS = {
     },
     'USE_SESSION_AUTH': False, # Set to True to enable Django session auth for Swagger UI
 }
+
+
+# User personalizado
+
+AUTH_USER_MODEL = 'mainApp.UserProfile'
