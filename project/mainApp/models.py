@@ -6,14 +6,10 @@ from django.contrib.auth.models import AbstractUser
 class UserProfile(AbstractUser):
     description = models.CharField(max_length=255, null=True)
 
-class Authors(models.Model):
-    name = models.CharField(max_length=255, null=False)
-
-
 class MetaBooks(models.Model):
     title = models.CharField(max_length=255, null=False)
     description = models.CharField(max_length=255, null=False)
-    author = models.ForeignKey(Authors, on_delete=models.CASCADE, null=False)
+    author = models.CharField(max_length=255, null=False)
     pages = models.IntegerField()
     release_date = models.DateField(default=datetime.now, null=False)
 
@@ -26,6 +22,10 @@ class PhysicalBooks(models.Model):
 class Transactions(models.Model):
     old_owner = models.ForeignKey(UserProfile, on_delete=models.CASCADE, null=False, related_name='old_owner')
     new_owner = models.ForeignKey(UserProfile, on_delete=models.CASCADE, null=False, related_name='new_owner')
-    physical_book = models.ForeignKey(PhysicalBooks, on_delete=models.CASCADE, null=False)
+    # physical_book = models.ForeignKey(PhysicalBooks, on_delete=models.CASCADE, null=False)
     transaction_date = models.DateField(default=datetime.now, null=False)
     transaction_type = models.CharField(max_length=16, null=False)
+
+class TransactionsPhysicalBook(models.Model):
+    transaction = models.ForeignKey(Transactions, on_delete=models.CASCADE, null=False)
+    physical_book = models.ForeignKey(PhysicalBooks, on_delete=models.CASCADE, null=False)
