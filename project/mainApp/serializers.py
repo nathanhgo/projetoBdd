@@ -1,16 +1,11 @@
 from rest_framework import serializers
-from .models import UserProfile, Authors, MetaBooks, PhysicalBooks, Transactions
+from .models import UserProfile, MetaBooks, PhysicalBooks, Transactions, Transaction_PhysicalBook
 
 
 class UserProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserProfile
         fields = ['id', 'username', 'first_name', 'email', 'description']
-
-class AuthorsSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Authors
-        fields = ['id', 'name']
 
 class MetaBooksSerializer(serializers.ModelSerializer):
     class Meta:
@@ -25,4 +20,9 @@ class PhysicalBooksSerializer(serializers.ModelSerializer):
 class TransactionsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Transactions
-        fields = ['id', 'old_owner', 'new_owner', 'physical_book', 'transaction_date', 'transaction_type']
+        fields = ['id', 'old_owner', 'new_owner', 'transaction_date', 'transaction_type']
+
+class Transaction_PhysicalBookSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Transaction_PhysicalBook
+        fields = ['id', 'transaction', 'physical_book']
