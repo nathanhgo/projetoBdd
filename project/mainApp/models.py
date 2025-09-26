@@ -25,6 +25,7 @@ class Transactions(models.Model):
     # physical_book = models.ForeignKey(PhysicalBooks, on_delete=models.CASCADE, null=False)
     transaction_date = models.DateField(default=datetime.now, null=False)
     transaction_type = models.CharField(max_length=16, null=False)
+    transaction_status = models.CharField(max_length=16, null=False)
 
 class Transaction_PhysicalBook(models.Model):
     transaction = models.ForeignKey(Transactions, on_delete=models.CASCADE, null=False)

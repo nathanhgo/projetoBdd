@@ -20,7 +20,7 @@ class PhysicalBooksSerializer(serializers.ModelSerializer):
 class TransactionsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Transactions
-        fields = ['id', 'old_owner', 'new_owner', 'transaction_date', 'transaction_type']
+        fields = ['id', 'old_owner', 'new_owner', 'transaction_date', 'transaction_type', 'transaction_status']
 
 class Transaction_PhysicalBookSerializer(serializers.ModelSerializer):
     class Meta:
