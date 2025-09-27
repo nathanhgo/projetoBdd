@@ -55,7 +55,7 @@ class UserViewSet(viewsets.ModelViewSet):
         else:
             return Response({ 'result': 'Dados inválidos'}, status=HTTP_400_BAD_REQUEST)
 
-    def retrieve(self, request, pk, *args, **kwargs):
+    def retrieve(self, request, pk=None, *args, **kwargs):
         # Regras de negócio
 
         # Fim de regras de negócio
@@ -81,10 +81,9 @@ class UserViewSet(viewsets.ModelViewSet):
         # Fim de regras de negócio
 
         instance = get_object_or_404(UserProfile, pk=pk)
-        serializer = self.get_serializer(instance, data=request.data, partial=True)
-        serializer.is_valid(raise_exception=True)
-        self.destroy(instance)
-        return Response(serializer.data)
+        serializer = self.get_serializer(instance)
+        instance.delete()
+        return Response({ 'result': serializer.data }, status=HTTP_200_OK)
 
 
 class MetaBooksViewSet(viewsets.ModelViewSet):
