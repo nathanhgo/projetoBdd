@@ -7,7 +7,7 @@ from .serializers import UserProfileSerializer, MetaBooksSerializer, PhysicalBoo
 from django.contrib.auth.models import User
 from rest_framework.response import Response
 from rest_framework.decorators import action
-from rest_framework.status import HTTP_200_OK, HTTP_201_CREATED, HTTP_204_NO_CONTENT, HTTP_400_BAD_REQUEST
+from rest_framework.status import HTTP_200_OK, HTTP_201_CREATED, HTTP_204_NO_CONTENT, HTTP_400_BAD_REQUEST, HTTP_500_INTERNAL_SERVER_ERROR, HTTP_404_NOT_FOUND
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from django.shortcuts import get_object_or_404
 
@@ -205,6 +205,28 @@ class PhysicalBooksViewSet(viewsets.ModelViewSet):
         physical_books = PhysicalBooks.objects.all()
         serializer = PhysicalBooksSerializer(physical_books, many=True)
         return Response({ 'result': serializer.data }, status=HTTP_200_OK)
+    
+    @action(detail=True, methods=['get'], url_path='user-books', permission_classes=[AllowAny])
+    def list_user_books(self, request, pk, *args, **kwargs):
+        profile_id = pk
+
+        if not profile_id:
+            return Response(
+                {'result': 'O parâmetro "profile_id" é obrigatório.'},
+                status=HTTP_400_BAD_REQUEST
+            )
+        
+        try:
+            user_profile = UserProfile.objects.get(pk=profile_id)
+            user_books = PhysicalBooks.objects.filter(owner=user_profile)
+            serializer = PhysicalBooksSerializer(user_books, many=True)
+            return Response(serializer.data, status=HTTP_200_OK)
+
+        except UserProfile.DoesNotExist:
+            return Response(
+                {'result': 'Nenhum perfil encontrado com o ID fornecido.'},
+                status=HTTP_404_NOT_FOUND
+            )
 
     def create(self, request, *args, **kwargs):
         print(request.data)
