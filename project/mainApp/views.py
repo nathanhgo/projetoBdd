@@ -266,6 +266,9 @@ class TransactionsViewSet(viewsets.ModelViewSet):
         if str(user.id) not in [str(old_owner_id), str(new_owner_id)]:
             return Response({'result': 'Você deve ser um dos usuários da transação'}, status=HTTP_400_BAD_REQUEST)
 
+        if str(old_owner_id) == str(new_owner_id):
+            return Response({'result': 'Não é permitido criar transação para si mesmo'}, status=HTTP_400_BAD_REQUEST)
+
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
