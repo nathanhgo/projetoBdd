@@ -295,7 +295,14 @@ class TransactionsViewSet(viewsets.ModelViewSet):
 
     def destroy(self, request, *args, **kwargs):
         return Response({'result': 'Exclusão não permitida'}, status=HTTP_400_BAD_REQUEST)
-
+    
+    @action(detail=True, methods=['get'], url_path='search-by-userid')
+    def user_transactions(self, request, pk=None):
+        user = get_object_or_404(UserProfile, pk=pk)
+        # pega todas as transações em que esse user é old_owner ou new_owner
+        transactions = Transactions.objects.filter(old_owner=user) or Transactions.objects.filter(new_owner=user)
+        serializer = self.get_serializer(transactions, many=True)
+        return Response({'result': serializer.data}, status=HTTP_200_OK)
 
 
 class Transaction_PhysicalBookViewSet(viewsets.ModelViewSet):
