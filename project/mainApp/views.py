@@ -112,6 +112,13 @@ class MetaBooksViewSet(viewsets.ModelViewSet):
         serializer = MetaBooksSerializer(meta_books, many=True)
         return Response({'result': serializer.data}, status=HTTP_200_OK)
     
+    @action(detail=True, methods=['get'], url_path='physicalbooks', permission_classes=[AllowAny])
+    def list_physical_books(self, request, pk=None):
+        get_object_or_404(MetaBooks, pk=pk)
+        queryset = PhysicalBooks.objects.filter(meta_book_id=pk).select_related('meta_book', 'owner')
+        serializer = PhysicalBooksSerializer(queryset, many=True)
+        return Response({'result': serializer.data}, status=HTTP_200_OK)
+    
     @action(detail=False, methods=['get'], url_path='filter', permission_classes=[AllowAny])
     def list_filter(self, request, *args, **kwargs):
         queryset = MetaBooks.objects.all()
