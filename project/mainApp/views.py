@@ -2,8 +2,9 @@ from django.shortcuts import render
 
 from rest_framework import viewsets
 from django.contrib.auth import login, logout, authenticate
-from .models import UserProfile, MetaBooks, PhysicalBooks, Transactions
-from .serializers import UserProfileSerializer, MetaBooksSerializer, PhysicalBooksSerializer, TransactionsSerializer
+from .models import UserProfile, MetaBooks, PhysicalBooks, Transactions, Transaction_PhysicalBook
+from .serializers import UserProfileSerializer, MetaBooksSerializer, PhysicalBooksSerializer, TransactionsSerializer, Transaction_PhysicalBookSerializer
+from django.contrib.auth.models import User
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework.status import HTTP_201_CREATED, HTTP_200_OK, HTTP_400_BAD_REQUEST
