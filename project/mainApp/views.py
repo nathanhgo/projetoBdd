@@ -111,6 +111,26 @@ class MetaBooksViewSet(viewsets.ModelViewSet):
         meta_books = MetaBooks.objects.all()
         serializer = MetaBooksSerializer(meta_books, many=True)
         return Response({'result': serializer.data}, status=HTTP_200_OK)
+    
+    @action(detail=False, methods=['get'], url_path='filter', permission_classes=[AllowAny])
+    def list_filter(self, request, *args, **kwargs):
+        queryset = MetaBooks.objects.all()
+
+        title = request.query_params.get('title', None)
+        author = request.query_params.get('author', None)
+        release_date = request.query_params.get('release_date', None)
+
+        if title:
+            queryset = queryset.filter(title__icontains=title)
+        
+        if author:
+            queryset = queryset.filter(author__icontains=author)
+
+        if release_date:
+            queryset = queryset.filter(release_date__icontains=release_date)
+
+        serializer = MetaBooksSerializer(queryset, many=True)
+        return Response({'result': serializer.data}, status=HTTP_200_OK)
 
     def create(self, request, *args, **kwargs):
         title = request.data.get('title')
@@ -178,7 +198,6 @@ class PhysicalBooksViewSet(viewsets.ModelViewSet):
         physical_books = PhysicalBooks.objects.all()
         serializer = PhysicalBooksSerializer(physical_books, many=True)
         return Response({ 'result': serializer.data }, status=HTTP_200_OK)
-
 
     def create(self, request, *args, **kwargs):
         print(request.data)
