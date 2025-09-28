@@ -1,13 +1,13 @@
 from django.shortcuts import render
 
-from rest_framework import viewsets, status
+from rest_framework import viewsets
+from django.contrib.auth import login, logout, authenticate
 from .models import UserProfile, MetaBooks, PhysicalBooks, Transactions
 from .serializers import UserProfileSerializer, MetaBooksSerializer, PhysicalBooksSerializer, TransactionsSerializer
-from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
-from rest_framework.status import HTTP_200_OK, HTTP_400_BAD_REQUEST
 from rest_framework.decorators import action
-from rest_framework.permissions import AllowAny
+from rest_framework.status import HTTP_201_CREATED, HTTP_200_OK, HTTP_400_BAD_REQUEST
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from django.shortcuts import get_object_or_404
 
 
@@ -43,32 +43,23 @@ class UserViewSet(viewsets.ModelViewSet):
 
 
     def create(self, request, *args, **kwargs):
-        print(request.data)
-        username = request.data.get('username')
-        email = request.data.get('email')
-        password = request.data.get('password')
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        
+        # O método create_user já lida com a criptografia da senha (especialmente pra parte de usuário do django)
+        user = UserProfile.objects.create_user(**serializer.validated_data)
+        
+        # login(request, user) - ISSO VAI LOGAR O USUÁRIO
 
-        if username and email and password:
-            user = UserProfile.objects.create_user(username=username, email=email, password=password)
-            serializer = UserProfileSerializer(user)
-            return Response({ 'result': serializer.data }, status=HTTP_200_OK)
-        else:
-            return Response({ 'result': 'Dados inválidos'}, status=HTTP_400_BAD_REQUEST)
+        
+        return Response(UserProfileSerializer(user).data, status=HTTP_201_CREATED)
 
     def retrieve(self, request, pk=None, *args, **kwargs):
-        # Regras de negócio
-
-        # Fim de regras de negócio
-
         instance = get_object_or_404(UserProfile, pk=pk)
         serializer = self.get_serializer(instance)
         return Response({ 'result': serializer.data }, status=HTTP_200_OK)
 
     def partial_update(self, request, pk, *args, **kwargs):
-        # Regras de negócio
-
-        # Fim de regras de negócio
-
         instance = get_object_or_404(UserProfile, pk=pk)
         serializer = self.get_serializer(instance, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
@@ -76,14 +67,34 @@ class UserViewSet(viewsets.ModelViewSet):
         return Response({ 'result': serializer.data }, status=HTTP_200_OK)
     
     def destroy(self, request, pk, *args, **kwargs):
-        # Regras de negócio
-
-        # Fim de regras de negócio
-
         instance = get_object_or_404(UserProfile, pk=pk)
         serializer = self.get_serializer(instance)
         instance.delete()
         return Response({ 'result': serializer.data }, status=HTTP_200_OK)
+    
+    @action(detail=False, methods=['post'], url_path='login', permission_classes=[AllowAny])
+    def login_user(self, request):
+        username = request.data.get('username')
+        password = request.data.get('password')
+
+        user = authenticate(request, username=username, password=password)
+
+        if user is not None:
+            login(request, user)
+            serializer = UserProfileSerializer(user)
+            return Response({'resultado': serializer.data}, status=HTTP_200_OK)
+        
+        return Response({'error': 'Login falhou'}, status=HTTP_400_BAD_REQUEST)
+
+    @action(detail=False, methods=['post'],  url_path='logout', permission_classes=[IsAuthenticated])
+    def logout_user(self, request):
+        logout(request)
+        return Response({'result': 'logout bem-sucedido'}, status=HTTP_200_OK)
+
+    @action(detail=False, methods=['get'], url_path='me', permission_classes=[IsAuthenticated])
+    def me(self, request):
+        serializer = UserProfileSerializer(request.user)
+        return Response({'result': serializer.data}, status=HTTP_200_OK)
 
 
 class MetaBooksViewSet(viewsets.ModelViewSet):

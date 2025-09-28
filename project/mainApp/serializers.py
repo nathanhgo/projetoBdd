@@ -5,7 +5,10 @@ from .models import UserProfile, MetaBooks, PhysicalBooks, Transactions, Transac
 class UserProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserProfile
-        fields = ['id', 'username', 'first_name', 'email', 'description']
+        fields = ['id', 'username', 'password', 'first_name', 'email', 'description']
+        extra_kwargs = {
+            'password': {'write_only': True}
+        }
 
 class MetaBooksSerializer(serializers.ModelSerializer):
     class Meta:
