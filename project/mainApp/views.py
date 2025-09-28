@@ -122,7 +122,7 @@ class MetaBooksViewSet(viewsets.ModelViewSet):
         serializer = PhysicalBooksSerializer(queryset, many=True)
         return Response({'result': serializer.data}, status=HTTP_200_OK)
     
-    @action(detail=False, methods=['get'], url_path='filter', permission_classes=[AllowAny])
+    @action(detail=False, methods=['post'], url_path='filter', permission_classes=[AllowAny])
     def list_filter(self, request, *args, **kwargs):
         queryset = MetaBooks.objects.all()
 
