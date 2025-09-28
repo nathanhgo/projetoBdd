@@ -53,7 +53,7 @@ class UserViewSet(viewsets.ModelViewSet):
         # login(request, user) - ISSO VAI LOGAR O USUÁRIO
 
         
-        return Response(UserProfileSerializer(user).data, status=HTTP_201_CREATED)
+        return Response({'result': UserProfileSerializer(user).data}, status=HTTP_201_CREATED)
 
     def retrieve(self, request, pk, *args, **kwargs):
         instance = get_object_or_404(UserProfile, pk=pk)
@@ -83,9 +83,9 @@ class UserViewSet(viewsets.ModelViewSet):
         if user is not None:
             login(request, user)
             serializer = UserProfileSerializer(user)
-            return Response({'resultado': serializer.data}, status=HTTP_200_OK)
+            return Response({'result': serializer.data}, status=HTTP_200_OK)
         
-        return Response({'error': 'Login falhou'}, status=HTTP_400_BAD_REQUEST)
+        return Response({'result': 'Login falhou'}, status=HTTP_400_BAD_REQUEST)
 
     @action(detail=False, methods=['post'],  url_path='logout', permission_classes=[IsAuthenticated])
     def logout_user(self, request):
