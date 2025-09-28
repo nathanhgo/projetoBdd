@@ -7,7 +7,7 @@ from .serializers import UserProfileSerializer, MetaBooksSerializer, PhysicalBoo
 from django.contrib.auth.models import User
 from rest_framework.response import Response
 from rest_framework.decorators import action
-from rest_framework.status import HTTP_201_CREATED, HTTP_200_OK, HTTP_400_BAD_REQUEST
+from rest_framework.status import HTTP_200_OK, HTTP_201_CREATED, HTTP_204_NO_CONTENT, HTTP_400_BAD_REQUEST
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from django.shortcuts import get_object_or_404
 
@@ -55,7 +55,7 @@ class UserViewSet(viewsets.ModelViewSet):
         
         return Response(UserProfileSerializer(user).data, status=HTTP_201_CREATED)
 
-    def retrieve(self, request, pk=None, *args, **kwargs):
+    def retrieve(self, request, pk, *args, **kwargs):
         instance = get_object_or_404(UserProfile, pk=pk)
         serializer = self.get_serializer(instance)
         return Response({ 'result': serializer.data }, status=HTTP_200_OK)
@@ -103,6 +103,65 @@ class MetaBooksViewSet(viewsets.ModelViewSet):
     serializer_class = MetaBooksSerializer
     permission_classes = [AllowAny]
 
+    def list(self, request, *args, **kwargs):
+        # Regras de negócio
+
+        # Fim de regras de negócio
+
+        meta_books = MetaBooks.objects.all()
+        serializer = MetaBooksSerializer(meta_books, many=True)
+        return Response({'result': serializer.data}, status=HTTP_200_OK)
+
+    def create(self, request, *args, **kwargs):
+        title = request.data.get('title')
+        description = request.data.get('description')
+        author = request.data.get('author')
+        pages = request.data.get('pages')
+        release_date = request.data.get('release_date')
+        
+        if not all([title, description, author, pages, release_date]):
+            return Response({'result': 'Dados inválidos'}, status=HTTP_400_BAD_REQUEST)
+
+        obj = MetaBooks.objects.create(
+            title=title,
+            description=description,
+            author=author,
+            pages=pages,
+            release_date=release_date
+        )
+
+        serializer = MetaBooksSerializer(obj)
+        return Response({'result': serializer.data}, status=HTTP_201_CREATED)
+
+    def retrieve(self, request, pk, *args, **kwargs):
+        # Regras de negócio
+
+        # Fim de regras de negócio
+
+        instance = get_object_or_404(MetaBooks, pk=pk)
+        serializer = self.get_serializer(instance)
+        return Response({'result': serializer.data}, status=HTTP_200_OK)
+
+    def partial_update(self, request, pk, *args, **kwargs):
+        # Regras de negócio
+
+        # Fim de regras de negócio
+
+        instance = get_object_or_404(MetaBooks, pk=pk)
+        serializer = self.get_serializer(instance, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+        return Response({'result': serializer.data}, status=HTTP_200_OK)
+
+    def destroy(self, request, pk, *args, **kwargs):
+        # Regras de negócio
+
+        # Fim de regras de negócio
+
+        instance = get_object_or_404(MetaBooks, pk=pk)
+        serializer = self.get_serializer(instance)
+        instance.delete()
+        return Response({'result': serializer.data}, status=HTTP_200_OK)
 
 class PhysicalBooksViewSet(viewsets.ModelViewSet):
     queryset = PhysicalBooks.objects.all()
@@ -163,7 +222,7 @@ class PhysicalBooksViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(instance, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
         self.destroy(instance)
-        return Response(serializer.data)
+        return Response({'result': serializer.data}, status=HTTP_200_OK)
 
 
 class TransactionsViewSet(viewsets.ModelViewSet):
@@ -229,4 +288,4 @@ class Transaction_PhysicalBookViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(instance, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
         self.destroy(instance)
-        return Response(serializer.data)
+        return Response({'result': serializer.data}, status=HTTP_200_OK)
