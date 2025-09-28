@@ -13,7 +13,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
 class MetaBooksSerializer(serializers.ModelSerializer):
     class Meta:
         model = MetaBooks
-        fields = ['id', 'title', 'description', 'author', 'pages', 'release_date']
+        fields = ['id', 'title', 'description', 'author', 'pages', 'release_date', 'cover_url']
 
 class PhysicalBooksSerializer(serializers.ModelSerializer):
     class Meta:

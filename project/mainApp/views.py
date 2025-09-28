@@ -118,6 +118,7 @@ class MetaBooksViewSet(viewsets.ModelViewSet):
         author = request.data.get('author')
         pages = request.data.get('pages')
         release_date = request.data.get('release_date')
+        cover_url = request.data.get('cover_url')
         
         if not all([title, description, author, pages, release_date]):
             return Response({'result': 'Dados inválidos'}, status=HTTP_400_BAD_REQUEST)
@@ -127,7 +128,8 @@ class MetaBooksViewSet(viewsets.ModelViewSet):
             description=description,
             author=author,
             pages=pages,
-            release_date=release_date
+            release_date=release_date,
+            cover_url=cover_url
         )
 
         serializer = MetaBooksSerializer(obj)

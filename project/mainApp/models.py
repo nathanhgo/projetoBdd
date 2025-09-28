@@ -12,6 +12,7 @@ class MetaBooks(models.Model):
     author = models.CharField(max_length=255, null=False)
     pages = models.IntegerField()
     release_date = models.DateField(default=datetime.now, null=False)
+    cover_url = models.CharField(max_length=800, null=True, blank=True)
 
 class PhysicalBooks(models.Model):
     meta_book = models.ForeignKey(MetaBooks, on_delete=models.CASCADE, null=False)
