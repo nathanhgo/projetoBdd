@@ -336,36 +336,46 @@ class Transaction_PhysicalBookViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
 
     def list(self, request, *args, **kwargs):
-        # Regras de negócio
-
-        # Fim de regras de negócio
-
-        transaction_physicalbook = Transaction_PhysicalBook.objects.all()
-        serializer = Transaction_PhysicalBookSerializer(transaction_physicalbook, many=True)
-        return Response({ 'result': serializer.data }, status=HTTP_200_OK)
+        user = request.user
+        # só retorna Transaction_PhysicalBook ligados a transações do usuário logado
+        transaction_physicalbook = Transaction_PhysicalBook.objects.filter(
+            transaction__old_owner=user
+        ) | Transaction_PhysicalBook.objects.filter(
+            transaction__new_owner=user
+        )
+        serializer = self.get_serializer(transaction_physicalbook, many=True)
+        return Response({'result': serializer.data}, status=HTTP_200_OK)
 
     def create(self, request, *args, **kwargs):
-        print(request.data)
-        transaction = request.data.get('transaction')
-        transaction = Transactions.objects.get(pk=transaction)
-        physical_book = request.data.get('physical_book')
-        physical_book = PhysicalBooks.objects.get(pk=physical_book)
+        transaction_id = request.data.get('transaction')
+        physical_book_id = request.data.get('physical_book')
 
-        if transaction and physical_book:
-            transaction_physicalbook = Transaction_PhysicalBook.objects.create(transaction=transaction, physical_book=physical_book)
-            serializer = Transaction_PhysicalBookSerializer(transaction_physicalbook)
-            return Response({ 'result': serializer.data }, status=HTTP_200_OK)
-        else:
-            return Response({ 'result': 'Dados inválidos'}, status=HTTP_400_BAD_REQUEST)
+        if not transaction_id or not physical_book_id:
+            return Response({'result': 'Dados inválidos'}, status=HTTP_400_BAD_REQUEST)
 
-    def retrieve(self, request, pk, *args, **kwargs):
-        # Regras de negócio
+        transaction = get_object_or_404(Transactions, pk=transaction_id)
+        physical_book = get_object_or_404(PhysicalBooks, pk=physical_book_id)
 
-        # Fim de regras de negócio
+        # só pode criar se o usuário logado estiver envolvido na transação
+        user = request.user
+        if user != transaction.old_owner and user != transaction.new_owner:
+            return Response({'result': 'Você não tem permissão para adicionar livros nesta transação'}, status=HTTP_400_BAD_REQUEST)
+
+        obj = Transaction_PhysicalBook.objects.create(transaction=transaction, physical_book=physical_book)
+        serializer = self.get_serializer(obj)
+        return Response({'result': serializer.data}, status=HTTP_201_CREATED)
+
+    def retrieve(self, request, pk=None, *args, **kwargs):
+        instance = get_object_or_404(Transaction_PhysicalBook, pk=pk)
+        user = request.user
+
+        # só pode acessar se o usuário logado estiver envolvido na transação
+        if user != instance.transaction.old_owner and user != instance.transaction.new_owner:
+            return Response({'result': 'Acesso negado'}, status=HTTP_400_BAD_REQUEST)
 
         instance = get_object_or_404(Transaction_PhysicalBook, pk=pk)
         serializer = self.get_serializer(instance)
-        return Response({ 'result': serializer.data }, status=HTTP_200_OK)
+        return Response({'result': serializer.data}, status=HTTP_200_OK)
 
     def update(self, request, *args, **kwargs):
         return Response({'result': 'Atualização não permitida'}, status=HTTP_400_BAD_REQUEST)
@@ -375,3 +385,16 @@ class Transaction_PhysicalBookViewSet(viewsets.ModelViewSet):
 
     def destroy(self, request, *args, **kwargs):
         return Response({'result': 'Exclusão não permitida'}, status=HTTP_400_BAD_REQUEST)
+
+    @action(detail=True, methods=['get'], url_path='search-by-transaction')
+    def list_by_transaction(self, request, pk=None):
+        transaction = get_object_or_404(Transactions, pk=pk)
+
+        # só pode ver se estiver envolvido
+        user = request.user
+        if user != transaction.old_owner and user != transaction.new_owner:
+            return Response({'result': 'Acesso negado'}, status=HTTP_400_BAD_REQUEST)
+
+        items = Transaction_PhysicalBook.objects.filter(transaction=transaction)
+        serializer = self.get_serializer(items, many=True)
+        return Response({'result': serializer.data}, status=HTTP_200_OK)
