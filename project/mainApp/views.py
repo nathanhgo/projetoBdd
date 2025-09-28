@@ -10,6 +10,7 @@ from rest_framework.decorators import action
 from rest_framework.status import HTTP_200_OK, HTTP_201_CREATED, HTTP_204_NO_CONTENT, HTTP_400_BAD_REQUEST, HTTP_500_INTERNAL_SERVER_ERROR, HTTP_404_NOT_FOUND
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from django.shortcuts import get_object_or_404
+from .services.google_books import search_volumes
 
 
 """
@@ -141,6 +142,15 @@ class MetaBooksViewSet(viewsets.ModelViewSet):
 
         serializer = MetaBooksSerializer(queryset, many=True)
         return Response({'result': serializer.data}, status=HTTP_200_OK)
+
+    @action(detail=False, methods=['get'], url_path='google-search', permission_classes=[AllowAny])
+    def google_search(self, request):
+        q = request.query_params.get('q')
+        if not q:
+            return Response({'result': 'Parâmetro q é obrigatório'}, status=HTTP_400_BAD_REQUEST)
+        data = search_volumes(q, start=int(request.query_params.get('start', 0)),
+                                limit=int(request.query_params.get('limit', 10)))
+        return Response({'result': data}, status=HTTP_200_OK)
 
     def create(self, request, *args, **kwargs):
         title = request.data.get('title')

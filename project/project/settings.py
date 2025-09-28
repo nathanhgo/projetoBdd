@@ -162,3 +162,7 @@ SWAGGER_SETTINGS = {
 # User personalizado
 
 AUTH_USER_MODEL = 'mainApp.UserProfile'
+
+# API GOOGLE BOOKS
+
+GOOGLE_BOOKS_API_KEY = config("GOOGLE_BOOKS_API_KEY", default="")
