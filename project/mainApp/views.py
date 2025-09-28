@@ -31,6 +31,8 @@ class UserViewSet(viewsets.ModelViewSet):
     queryset = UserProfile.objects.all()
     serializer_class = UserProfileSerializer
     permission_classes = [AllowAny]
+    http_method_names = ['get', 'post', 'patch', 'delete']
+
 
 
     def list(self, request, *args, **kwargs):
@@ -102,6 +104,7 @@ class MetaBooksViewSet(viewsets.ModelViewSet):
     queryset = MetaBooks.objects.all()
     serializer_class = MetaBooksSerializer
     permission_classes = [AllowAny]
+    http_method_names = ['get', 'post', 'patch', 'delete']
 
     def list(self, request, *args, **kwargs):
         # Regras de negócio
@@ -196,6 +199,7 @@ class PhysicalBooksViewSet(viewsets.ModelViewSet):
     queryset = PhysicalBooks.objects.all()
     serializer_class = PhysicalBooksSerializer
     permission_classes = [AllowAny]
+    http_method_names = ['get', 'post', 'patch', 'delete']
 
     def list(self, request, *args, **kwargs):
         # Regras de negócio
@@ -279,6 +283,7 @@ class TransactionsViewSet(viewsets.ModelViewSet):
     queryset = Transactions.objects.all()
     serializer_class = TransactionsSerializer
     permission_classes = [IsAuthenticated]
+    http_method_names = ['get', 'post']
 
     def create(self, request, *args, **kwargs):
         user = request.user
@@ -312,15 +317,6 @@ class TransactionsViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(transactions, many=True)
         return Response({'result': serializer.data}, status=HTTP_200_OK)
 
-    def update(self, request, *args, **kwargs):
-        return Response({'result': 'Atualização não permitida'}, status=HTTP_400_BAD_REQUEST)
-
-    def partial_update(self, request, *args, **kwargs):
-        return Response({'result': 'Atualização não permitida'}, status=HTTP_400_BAD_REQUEST)
-
-    def destroy(self, request, *args, **kwargs):
-        return Response({'result': 'Exclusão não permitida'}, status=HTTP_400_BAD_REQUEST)
-    
     @action(detail=True, methods=['get'], url_path='search-by-userid')
     def user_transactions(self, request, pk=None):
         user = get_object_or_404(UserProfile, pk=pk)
@@ -334,6 +330,7 @@ class Transaction_PhysicalBookViewSet(viewsets.ModelViewSet):
     queryset = Transaction_PhysicalBook.objects.all()
     serializer_class = Transaction_PhysicalBookSerializer
     permission_classes = [IsAuthenticated]
+    http_method_names = ['get', 'post']
 
     def list(self, request, *args, **kwargs):
         user = request.user
@@ -377,14 +374,6 @@ class Transaction_PhysicalBookViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(instance)
         return Response({'result': serializer.data}, status=HTTP_200_OK)
 
-    def update(self, request, *args, **kwargs):
-        return Response({'result': 'Atualização não permitida'}, status=HTTP_400_BAD_REQUEST)
-
-    def partial_update(self, request, *args, **kwargs):
-        return Response({'result': 'Atualização não permitida'}, status=HTTP_400_BAD_REQUEST)
-
-    def destroy(self, request, *args, **kwargs):
-        return Response({'result': 'Exclusão não permitida'}, status=HTTP_400_BAD_REQUEST)
 
     @action(detail=True, methods=['get'], url_path='search-by-transaction')
     def list_by_transaction(self, request, pk=None):
