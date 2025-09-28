@@ -217,8 +217,10 @@ class PhysicalBooksViewSet(viewsets.ModelViewSet):
         # Fim de regras de negócio
 
         physical_books = PhysicalBooks.objects.all()
+        meta_books = MetaBooks.objects.all()
         serializer = PhysicalBooksSerializer(physical_books, many=True)
-        return Response({ 'result': serializer.data }, status=HTTP_200_OK)
+        serializer2 = MetaBooksSerializer(meta_books, many=True)
+        return Response({ 'result': serializer.data, 'result2': serializer2.data}, status=HTTP_200_OK)
     
     @action(detail=True, methods=['get'], url_path='user-books', permission_classes=[AllowAny])
     def list_user_books(self, request, pk, *args, **kwargs):
