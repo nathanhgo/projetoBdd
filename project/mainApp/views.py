@@ -168,6 +168,8 @@ class PhysicalBooksViewSet(viewsets.ModelViewSet):
 class TransactionsViewSet(viewsets.ModelViewSet):
     queryset = Transactions.objects.all()
     serializer_class = TransactionsSerializer
+    permission_classes = [AllowAny]
+
 
 class Transaction_PhysicalBookViewSet(viewsets.ModelViewSet):
     queryset = Transaction_PhysicalBook.objects.all()
