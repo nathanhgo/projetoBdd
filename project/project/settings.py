@@ -41,7 +41,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'mainApp',
     'rest_framework',
-    'drf_yasg'
+    'drf_yasg',
+    'corsheaders'
 ]
 
 MIDDLEWARE = [
@@ -52,6 +53,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    "corsheaders.middleware.CorsMiddleware"
 ]
 
 ROOT_URLCONF = 'project.urls'
@@ -166,3 +168,7 @@ AUTH_USER_MODEL = 'mainApp.UserProfile'
 # API GOOGLE BOOKS
 
 GOOGLE_BOOKS_API_KEY = config("GOOGLE_BOOKS_API_KEY", default="")
+
+# CORS DJANGO
+
+CORS_ALLOW_ALL_ORIGINS = True
