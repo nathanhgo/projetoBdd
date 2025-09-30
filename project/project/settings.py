@@ -27,7 +27,7 @@ SECRET_KEY = 'django-insecure-+p5)=+pqf#_tflh9(kq+q7(pd&zh^r6%w=a9vb=douj(9v*!lu
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 
 
 # Application definition
@@ -41,10 +41,12 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'mainApp',
     'rest_framework',
-    'drf_yasg'
+    'drf_yasg',
+    'corsheaders'
 ]
 
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -166,3 +168,11 @@ AUTH_USER_MODEL = 'mainApp.UserProfile'
 # API GOOGLE BOOKS
 
 GOOGLE_BOOKS_API_KEY = config("GOOGLE_BOOKS_API_KEY", default="")
+
+# CORS DJANGO
+
+# CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_CREDENTIALS = False
+CSRF_TRUSTED_ORIGINS = ["http://localhost:3000"]
+
+CORS_ALLOWED_ORIGINS = ["http://localhost:3000"] 
