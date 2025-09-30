@@ -1,5 +1,6 @@
 from django.shortcuts import render
 
+from django.db import transaction
 from rest_framework import viewsets
 from django.contrib.auth import login, logout, authenticate
 from .models import UserProfile, MetaBooks, PhysicalBooks, Transactions, Transaction_PhysicalBook
@@ -35,7 +36,6 @@ class UserViewSet(viewsets.ModelViewSet):
     http_method_names = ['get', 'post', 'patch', 'delete']
 
 
-
     def list(self, request, *args, **kwargs):
         # Regras de negócio
 
@@ -45,7 +45,7 @@ class UserViewSet(viewsets.ModelViewSet):
         serializer = UserProfileSerializer(users, many=True)
         return Response({ 'result': serializer.data }, status=HTTP_200_OK)
 
-
+    @transaction.atomic
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -76,6 +76,7 @@ class UserViewSet(viewsets.ModelViewSet):
         instance.delete()
         return Response({ 'result': serializer.data }, status=HTTP_200_OK)
     
+    @transaction.atomic
     @action(detail=False, methods=['post'], url_path='login', permission_classes=[AllowAny])
     def login_user(self, request):
         username = request.data.get('username')
@@ -90,6 +91,7 @@ class UserViewSet(viewsets.ModelViewSet):
         
         return Response({'result': 'Login falhou'}, status=HTTP_400_BAD_REQUEST)
 
+    @transaction.atomic
     @action(detail=False, methods=['post'],  url_path='logout', permission_classes=[IsAuthenticated])
     def logout_user(self, request):
         logout(request)
@@ -123,6 +125,7 @@ class MetaBooksViewSet(viewsets.ModelViewSet):
         serializer = PhysicalBooksSerializer(queryset, many=True)
         return Response({'result': serializer.data}, status=HTTP_200_OK)
     
+    @transaction.atomic
     @action(detail=False, methods=['post'], url_path='filter', permission_classes=[AllowAny])
     def list_filter(self, request, *args, **kwargs):
         queryset = MetaBooks.objects.all()
@@ -152,6 +155,7 @@ class MetaBooksViewSet(viewsets.ModelViewSet):
                                 limit=int(request.query_params.get('limit', 10)))
         return Response({'result': data}, status=HTTP_200_OK)
 
+    @transaction.atomic
     def create(self, request, *args, **kwargs):
         title = request.data.get('title')
         description = request.data.get('description')
@@ -242,6 +246,7 @@ class PhysicalBooksViewSet(viewsets.ModelViewSet):
                 status=HTTP_404_NOT_FOUND
             )
 
+    @transaction.atomic
     def create(self, request, *args, **kwargs):
         print(request.data)
         meta_book = request.data.get('meta_book')
@@ -295,6 +300,7 @@ class TransactionsViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     http_method_names = ['get', 'post']
 
+    @transaction.atomic
     def create(self, request, *args, **kwargs):
         user = request.user
         old_owner_id = request.data.get('old_owner')
@@ -353,6 +359,7 @@ class Transaction_PhysicalBookViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(transaction_physicalbook, many=True)
         return Response({'result': serializer.data}, status=HTTP_200_OK)
 
+    @transaction.atomic
     def create(self, request, *args, **kwargs):
         transaction_id = request.data.get('transaction')
         physical_book_id = request.data.get('physical_book')
